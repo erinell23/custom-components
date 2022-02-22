@@ -1,34 +1,59 @@
-import { ReactElement } from "react";
+import { CSSProperties, ReactElement } from "react";
 
 
 export interface TableProps {
-    pagination: PaginationProps;
-    onChange: (pageAction: PaginatingAndSortingProps) => void;
     children?: ReactElement | ReactElement[];
     className?: string;
-    classTable?: string;
     classPagination?: string;
+    classTable?: string;
+    onChange: (pageAction: PaginatingAndSortingProps) => void;
+    dataTable: DataTableProps;
+    style?: CSSProperties;
+}
+
+export interface TableContextProps {
+    handeChangePaginatingAndSorting: (page: PaginatingAndSortingProps) => void
+    pageAction: PaginatingAndSortingProps;
+    dataTable: DataTableProps;
+}
+
+export interface PaginatingAndSortingProps {
+    order: string;
+    page: number;
+    sort: string;
 }
 
 export interface PaginationComponentProps {
-    pagination: PaginationProps;
-    style?: React.CSSProperties;
     className?: string;
+    style?: CSSProperties;
+    paginationData: PaginationDataProps;
 }
 
-export interface PaginationProps {
-    totalPages: number,
-    number: number;
-    totalElements?: number;
-    showPagination?: boolean;
-    showLastedAndFirst?: boolean;
+export interface PaginationDataProps {
     maxItemsShow?: number;
+    number: number;
+    showLastedAndFirst?: boolean;
+    totalPages: number;
+}
+
+export interface DataTableProps {
+    content?: Array<{ [key: string]: any }>;
+    maxItemsShow?: number;
+    number: number;
+    showLastedAndFirst?: boolean;
+    showPagination?: boolean;
+    titles?: Array<TitleTableProps>;
+    totalElements?: number;
+    totalPages: number,
+}
+
+export interface TitleTableProps {
+    sort?: string;
+    name?: string | Array<string>;
+    title: string;
 }
 
 
 
-export interface PaginatingAndSortingProps {
-    page: number;
-    order: string;
-    sort: string;
-}
+
+

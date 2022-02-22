@@ -33,12 +33,7 @@
             "fecha": "2018-02-28 14:58:10.7",
             "entregado": "8-925-15",
             "pdf": null,
-            "personaEntrega": {
-                "id": 1,
-                "cedula": "8-859-1553",
-                "nombre": "BRIAN STEFANO",
-                "apellido": "PAZ MEDINA"
-            },
+            "personaEntrega": null,
             "personaRecibe": {
                 "id": 5,
                 "cedula": "8-782-2260",
@@ -276,7 +271,7 @@
     "last": false,
     "totalPages": 43,
     "totalElements": 422,
-    "number": 20,
+    "number": 0,
     "sort": {
         "sorted": true,
         "unsorted": false,

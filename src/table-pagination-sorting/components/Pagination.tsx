@@ -1,78 +1,78 @@
-import { useContext, useRef } from 'react';
+import React, { useContext } from 'react';
+import PropTypes from 'prop-types'
 import { PaginationComponentProps } from '../interfaces/interfaces'
 import { TableContext } from './Table';
-export const Pagination = ({ pagination }:  PaginationComponentProps) => {
+import { usePaginator } from '../hooks/usePaginator';
+import styles from '../styles/styles.module.css';
 
-    const { handeChangePagination, pageAction } = useContext(TableContext);
+export const Pagination = ({ paginationData, className, style }: PaginationComponentProps) => {
 
-    const items = Math.min(pagination.maxItemsShow ? pagination.maxItemsShow : 3, pagination.totalPages);
+    const { number, totalPages, showLastedAndFirst } = paginationData;
 
-    const sum = useRef(pagination.number);
+    const { handeChangePaginatingAndSorting, pageAction } = useContext(TableContext);
 
-    const handleChangePage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, i: number) => {
-        e.preventDefault();
-
-        const verificar = (veri: number) => {
-            let confi = veri;
-            if (veri + items > pagination.totalPages) {
-                confi = verificar(veri - 1);
-            }
-            return confi;
-        }
-        
-        sum.current = (i >= items - Math.trunc(items / 2) ? verificar(i - Math.trunc(items / 2)) : 0);
-
-        const page = i <= 0 ? 0 : (i >= pagination.totalPages ? pagination.totalPages : i);
-
-        handeChangePagination({...pageAction, page});
-    }
+    const { handleChangePage, items, sumar } = usePaginator({
+        ...paginationData,
+        handeChangePaginatingAndSorting,
+        pageAction
+    });
     return (
-        <div style={{ width: '100%' }}>
-            <ul className="pagination">
-                {items - Math.trunc(items / 2) <= pageAction.page
-                    && <li className='page-item'>
-                        <a className='page-link' href='/#'
-                            onClick={(e) => handleChangePage(e, 0)}
-                        >1...</a>
-                    </li>}
-                {pagination.showLastedAndFirst
-                    && <li className='page-item'>
-                        <a className='page-link' href='/#' onClick={(e) => handleChangePage(e, pageAction.page - items)}>{'«'}</a>
-                    </li>}
-                {pagination.totalPages > 1
-                    && <li className='page-item'>
-                        <a className='page-link' href='/#' onClick={(e) => handleChangePage(e, pageAction.page - 1)}>{'<'}</a>
-                    </li>}
-                {Array.apply(null, Array(pagination.maxItemsShow))
-                    .map((ob, i) =>
-                        i + sum.current <= pagination.totalPages &&
-                        <li
-                            className='page-item'
-                            key={i + '_itPg_' + sum.current}
-                        >
-                            <a className={`page-link ${pageAction.page === i + sum.current ? 'active' : ''}`}
-                                href='/#'
-                                onClick={(e) => handleChangePage(e, i + sum.current)}
-                            >{i + 1 + sum.current}</a>
-                        </li>
-                    )}
+        <ul className={`${styles.pagination} ${className && className}`} style={style}>
+            {sumar > 0
+                && <li className={styles.pg_item}>
+                    <a className={styles.pg_link} href='/#'
+                        onClick={(e) => handleChangePage(e, 0)}
+                    >1...</a>
+                </li>}
+            {showLastedAndFirst && items > 1 && number >= items
+                && <li className={styles.pg_item}>
+                    <a className={styles.pg_link} href='/#' onClick={(e) => handleChangePage(e, number - items)}>{'«'}</a>
+                </li>}
+            {number > 0
+                && <li className={styles.pg_item}>
+                    <a className={styles.pg_link} href='/#' onClick={(e) => handleChangePage(e, number - 1)}>{'<'}</a>
+                </li>}
+            {Array.apply(null, Array(items))
+                .map((ob, i) =>
+                    i + sumar < totalPages &&
+                    <li
+                        className={styles.pg_item}
+                        key={i + '_itPg_' + sumar}
+                    >
+                        {ob && ' '}
+                        <a className={`${styles.pg_link} ${number === i + sumar ? styles.active : ''}`}
+                            href='/#'
+                            onClick={(e) => handleChangePage(e, i + sumar)}
+                        >{i + 1 + sumar}</a>
+                    </li>
+                )}
 
 
-                {pagination.totalPages > 1
-                    && <li className='page-item'>
-                        <a className='page-link' href='/#' onClick={(e) => handleChangePage(e, pageAction.page + 1)}>{'>'}</a>
-                    </li>}
-                {pagination.showLastedAndFirst &&
-                    <li className='page-item'>
-                        <a className='page-link' href='/#' onClick={(e) => handleChangePage(e, pageAction.page + items)}>{'»'}</a>
-                    </li>}
-                {pagination.totalPages - Math.trunc(items / 2) > pageAction.page +1
-                    && <li className='page-item'>
-                        <a className='page-link' href='/#'
-                            onClick={(e) => handleChangePage(e, pagination.totalPages-1)}
-                        >...{pagination.totalPages}</a>
-                    </li>}
-            </ul>
-        </div>
+            {number < totalPages -1 
+                && <li className={styles.pg_item}>
+                    <a className={styles.pg_link} href='/#' onClick={(e) => handleChangePage(e, number + 1)}>{'>'}</a>
+                </li>}
+            {showLastedAndFirst && items > 1 && number < totalPages - items
+                && <li className={styles.pg_item}>
+                    <a className={styles.pg_link} href='/#' onClick={(e) => handleChangePage(e, number + items)}>{'»'}</a>
+                </li>}
+            {sumar + items < totalPages
+                && <li className={styles.pg_item}>
+                    <a className={styles.pg_link} href='/#'
+                        onClick={(e) => handleChangePage(e, totalPages - 1)}
+                    >...{totalPages}</a>
+                </li>}
+        </ul>
     )
 }
+Pagination.propTypes = {
+    className: PropTypes.string,
+    style: PropTypes.object,
+    paginationData: PropTypes.shape({
+        maxItemsShow: PropTypes.number,
+        number: PropTypes.number.isRequired,
+        showLastedAndFirst: PropTypes.bool,
+        totalPages: PropTypes.number.isRequired,
+    })
+}
+
